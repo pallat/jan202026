@@ -1,0 +1,9 @@
+POST http://localhost:8080/login
+
+{
+    "username": "pallat",
+    "password": "pallat"
+}
+
+###
+GET http://localhost:8080/v1/data

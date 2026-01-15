@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure API Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-weight: 600;
+            font-size: 2rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #data-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        .result-box {
+            margin-top: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 0.9rem;
+            min-height: 40px;
+            border-left: 4px solid var(--primary-color);
+            word-break: break-all;
+        }
+
+        .status-msg {
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+
+        .error { color: #f87171; }
+        .success { color: #4ade80; }
+    </style>
+</head>
+<body>
+    <div class="container" id="login-container">
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Enter your credentials to access the API</p>
+        
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="pallat" value="pallat">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" value="pallat">
+        </div>
+        
+        <button id="login-btn">Login</button>
+        <div id="login-status" class="status-msg"></div>
+
+        <div id="data-section">
+            <button id="get-data-btn">Request Secured Data</button>
+            <div id="data-result" class="result-box">Response will appear here...</div>
+        </div>
+    </div>
+
+    <script>
+        const loginBtn = document.getElementById('login-btn');
+        const getDataBtn = document.getElementById('get-data-btn');
+        const loginStatus = document.getElementById('login-status');
+        const dataResult = document.getElementById('data-result');
+        const dataSection = document.getElementById('data-section');
+
+        loginBtn.addEventListener('click', async () => {
+            loginStatus.textContent = 'Logging in...';
+            loginStatus.className = 'status-msg';
+
+            try {
+                // We'll use a standard form-encoded post as the handler currently expects
+                const res = await fetch('/login', {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    loginStatus.textContent = 'Login successful!';
+                    loginStatus.classList.add('success');
+                    dataSection.style.display = 'block';
+                    loginBtn.style.display = 'none';
+                    document.querySelectorAll('.form-group').forEach(el => el.style.display = 'none');
+                } else {
+                    loginStatus.textContent = 'Login failed. Please try again.';
+                    loginStatus.classList.add('error');
+                }
+            } catch (err) {
+                loginStatus.textContent = 'Error connecting to server.';
+                loginStatus.classList.add('error');
+            }
+        });
+
+        getDataBtn.addEventListener('click', async () => {
+            dataResult.textContent = 'Fetching data...';
+            try {
+                const res = await fetch('/v1/data');
+                const text = await res.text();
+                dataResult.textContent = text;
+                
+                if (!res.ok) {
+                    dataResult.style.borderColor = '#f87171';
+                } else {
+                    dataResult.style.borderColor = '#4ade80';
+                }
+            } catch (err) {
+                dataResult.textContent = 'Error: ' + err.message;
+                dataResult.style.borderColor = '#f87171';
+            }
+        });
+    </script>
+</body>
+</html>
