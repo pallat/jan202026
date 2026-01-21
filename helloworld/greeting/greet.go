@@ -5,6 +5,8 @@ import (
 	"unicode"
 )
 
+var Greet = greet
+
 func greet(name ...string) string {
 	if len(name) == 0 {
 		return "Hello, my friend."
