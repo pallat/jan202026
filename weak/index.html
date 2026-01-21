@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure API Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-weight: 600;
+            font-size: 2rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #data-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        .result-box {
+            margin-top: 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 0.9rem;
+            min-height: 40px;
+            border-left: 4px solid var(--primary-color);
+            word-break: break-all;
+        }
+
+        .status-msg {
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+
+        .error {
+            color: #f87171;
+        }
+
+        .success {
+            color: #4ade80;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="login-container">
+        <div id="welcome-msg"
+            style="margin-bottom: 20px; text-align: center; color: #4ade80; font-weight: 600; padding: 10px; border-radius: 8px;">
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="pallat" value="pallat">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="••••••••" value="pallat">
+        </div>
+
+        <button id="login-btn">Login</button>
+        <div id="login-status" class="status-msg"></div>
+
+        <button id="show-cookie-btn"
+            style="background: transparent; border: 1px solid var(--primary-color); color: var(--primary-color); margin-top: 20px;">Show
+            Cookies (Direct JS Access)</button>
+
+        <div id="data-section">
+            <button id="get-data-btn">Request Secured Data</button>
+            <div id="data-result" class="result-box">Response will appear here...</div>
+        </div>
+
+        <div id="playground-section"
+            style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+            <h2 style="font-size: 1.2rem; margin-bottom: 15px;">XSS Playground</h2>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="payload-btn" data-payload="<script>alert('XSS: Alert triggered!')</script>">1. Simple
+                    Alert</button>
+                <button class="payload-btn" data-payload="<img src=x onerror='alert(\" Stolen Cookie: \" +
+                    document.cookie)'>">2. Cookie Stealer (Alert)</button>
+                <button class="payload-btn"
+                    data-payload="<style>body{filter:invert(1)}</style><h1>Site Defaced!</h1>">3. UI Defacement</button>
+            </div>
+            <button id="reset-btn"
+                style="background: #334155; margin-top: 20px; font-size: 0.8rem; padding: 10px;">Reset Demo</button>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px; line-height: 1.4;">
+                <b>Why this works:</b> The server reads the <code>name</code> parameter and injects it into the page
+                using <code>.innerHTML</code> without sanitization. Combined with <code>HttpOnly: false</code>,
+                JavaScript can steal your session token.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Reflected XSS Vulnerability - THE SINK
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('name');
+        if (userName) {
+            document.getElementById('welcome-msg').innerHTML = 'Welcome, ' + userName; // VULNERABLE
+        }
+
+        const loginBtn = document.getElementById('login-btn');
+        const getDataBtn = document.getElementById('get-data-btn');
+        const showCookieBtn = document.getElementById('show-cookie-btn');
+        const loginStatus = document.getElementById('login-status');
+        const dataResult = document.getElementById('data-result');
+        const dataSection = document.getElementById('data-section');
+        const resetBtn = document.getElementById('reset-btn');
+
+        // Handle pre-defined payloads
+        document.querySelectorAll('.payload-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const payload = btn.getAttribute('data-payload');
+                const newUrl = window.location.origin + window.location.pathname + '?name=' + encodeURIComponent(payload);
+                window.location.href = newUrl;
+            });
+        });
+
+        resetBtn.addEventListener('click', () => {
+            window.location.href = window.location.origin + window.location.pathname;
+        });
+
+        showCookieBtn.addEventListener('click', () => {
+            alert('Current Cookies: ' + (document.cookie || 'No cookies found!'));
+        });
+
+        loginBtn.addEventListener('click', async () => {
+            loginStatus.textContent = 'Logging in...';
+            loginStatus.className = 'status-msg';
+
+            try {
+                const res = await fetch('/login', { method: 'POST' });
+                if (res.ok) {
+                    loginStatus.textContent = 'Login successful!';
+                    loginStatus.classList.add('success');
+                    dataSection.style.display = 'block';
+                    loginBtn.style.display = 'none';
+                    document.querySelectorAll('.form-group').forEach(el => el.style.display = 'none');
+                } else {
+                    loginStatus.textContent = 'Login failed.';
+                    loginStatus.classList.add('error');
+                }
+            } catch (err) {
+                loginStatus.textContent = 'Error: ' + err.message;
+                loginStatus.classList.add('error');
+            }
+        });
+
+        getDataBtn.addEventListener('click', async () => {
+            dataResult.textContent = 'Fetching data...';
+            try {
+                const res = await fetch('/v1/data');
+                const text = await res.text();
+                dataResult.textContent = text;
+                dataResult.style.borderColor = res.ok ? '#4ade80' : '#f87171';
+            } catch (err) {
+                dataResult.textContent = 'Error: ' + err.message;
+                dataResult.style.borderColor = '#f87171';
+            }
+        });
+    </script>
+</body>
+
+</html>
