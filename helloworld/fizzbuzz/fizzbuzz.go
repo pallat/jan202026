@@ -1,4 +1,4 @@
-package foobar
+package fizzbuzz
 
 import "fmt"
 
