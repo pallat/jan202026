@@ -1,9 +1,52 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-	fmt.Println(subString("php"))
+	fmt.Println(subString("สกลนคร"))
+}
+
+func mainOfMap() {
+	var m map[int]int
+	m = make(map[int]int)
+	m[0] = 1
+	m[1] = 2
+	m[2] = 3
+
+	for k, v := range m {
+		fmt.Println(k, v)
+	}
+
+	s := []int{1, 2, 3}
+	for i, v := range s {
+		fmt.Println(i, v)
+	}
+
+}
+
+func count(i int) int {
+	n := 0
+	for i := 0; i < i; i++ {
+		n += i
+	}
+	return n
+}
+
+type pFunc func() int
+
+func one() int   { return 1 }
+func Peter() int { return one() + one() }
+
+func factory(a, b pFunc) pFunc {
+	return func() int {
+		return a() + b()
+	}
+}
+
+func addp(p *int, n int) {
+	*p += n
 }
 
 func subString(s string) []string {
