@@ -2,10 +2,80 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
+type Account struct {
+	Email       string
+	CreatedDate time.Time
+}
+
+func NewAccount(email string) Account {
+	return Account{
+		Email:       email,
+		CreatedDate: time.Now(),
+	}
+}
+
+func AccountString(account Account) string {
+	return fmt.Sprintf("%s registered on %s", account.Email, account.CreatedDate.Format("02/01/06 15:04:05"))
+}
+
+type I interface {
+	M(int) int
+}
+
+type Int int
+
+func (i Int) M(n int) int {
+	return int(i) + n
+}
+
+type Text func() string
+
+func (t Text) String() string {
+	return t()
+}
+
 func main() {
-	fmt.Println(subString("สกลนคร"))
+	var t Text = func() string {
+		return "my text"
+	}
+	fmt.Println(t.String())
+}
+
+func mainOfAny() {
+	var a interface{}
+	a = 10
+	n := 20
+
+	if m, ok := a.(int); ok {
+		s := m + n
+		fmt.Println(s)
+	}
+
+	fmt.Printf("%T %v\n", a, a)
+	a = "ten"
+	fmt.Printf("%T %v\n", a, a)
+	a = func() string { return "hi" }
+	fmt.Printf("%T %v\n", a, a)
+
+}
+
+func mainOfStruct() {
+	account := NewAccount("yod@gopher.com")
+	fmt.Println(AccountString(account))
+}
+
+func subString(s string) []string {
+	s += "*"
+	runes := []rune(s)
+	couple := []string{}
+	for len(runes) > 1 {
+		couple = append(couple, string(runes[:2]))
+		runes = runes[2:]
+	}
+	return couple
 }
 
 func mainOfMap() {
@@ -47,16 +117,6 @@ func factory(a, b pFunc) pFunc {
 
 func addp(p *int, n int) {
 	*p += n
-}
-
-func subString(s string) []string {
-	s += "*"
-	couple := []string{}
-	for len(s) > 1 {
-		couple = append(couple, s[:2])
-		s = s[2:]
-	}
-	return couple
 }
 
 func reverse(four [4]int) [4]int {
